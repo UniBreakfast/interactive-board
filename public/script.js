@@ -4,16 +4,20 @@ const cursors = new Map();
 
 let userId;
 
-// Track mouse movement
-document.addEventListener('mousemove', (e) => {
-  const data = {
-    type: 'mousemove',
-    userId: userId,
-    x: e.clientX,
-    y: e.clientY
-  };
-  ws.send(JSON.stringify(data));
-});
+// Handle WebSocket connection
+ws.onopen = () => {
+  // Track mouse movement
+  document.addEventListener('mousemove', (e) => {
+    const data = {
+      type: 'mousemove',
+      userId: userId,
+      x: e.clientX,
+      y: e.clientY
+    };
+    ws.send(JSON.stringify(data));
+  });
+};
+
 
 // Handle incoming messages
 ws.onmessage = (event) => {
