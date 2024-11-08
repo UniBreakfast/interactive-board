@@ -28,22 +28,35 @@ const clients = new Set();
 
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
+  // Generate a random user ID
+  const userId = Math.random().toString(36).substr(2, 9);
+
+  ws.userId = userId;
+
   clients.add(ws);
+
+  // Notify the client of its user ID
+  ws.send(JSON.stringify({ type: 'connect', userId }));
 
   // Handle incoming messages
   ws.on('message', (message) => {
     // Broadcast the message to all other clients
     const data = message.toString();
     clients.forEach(client => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(data);
-      }
+      // if (client !== ws && client.readyState === WebSocket.OPEN) {
+      client.send(data);
+      // }
     });
   });
 
   // Handle client disconnection
   ws.on('close', () => {
     clients.delete(ws);
+    clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: 'disconnect', userId: ws.userId }));
+      }
+    });
   });
 });
 

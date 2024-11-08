@@ -2,8 +2,7 @@ const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 const ws = new WebSocket(protocol + '://' + window.location.host);
 const cursors = new Map();
 
-// Generate a random user ID
-const userId = Math.random().toString(36).substr(2, 9);
+let userId;
 
 // Track mouse movement
 document.addEventListener('mousemove', (e) => {
@@ -32,6 +31,13 @@ ws.onmessage = (event) => {
     const cursor = cursors.get(data.userId);
     cursor.style.left = data.x + 'px';
     cursor.style.top = data.y + 'px';
+  } else if (data.type === 'connect') {
+    userId = data.userId;
+  } else if (data.type === 'disconnect') {
+    if (cursors.has(data.userId)) {
+      cursors.get(data.userId).remove();
+      cursors.delete(data.userId);
+    }
   }
 };
 
