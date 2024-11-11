@@ -3,6 +3,11 @@ const ws = new WebSocket(protocol + '://' + window.location.host);
 const cursors = new Map();
 
 let userId;
+window.onmouseout = (event) => {
+  if (!event.relatedTarget && userId) {
+    ws.send(JSON.stringify({ type: 'hide', userId }));
+  }
+}
 
 // Handle WebSocket connection
 ws.onopen = () => {
@@ -35,6 +40,11 @@ ws.onmessage = (event) => {
     const cursor = cursors.get(data.userId);
     cursor.style.left = data.x + 'px';
     cursor.style.top = data.y + 'px';
+    cursor.style.display = 'block';
+  } else if (data.type === 'hide') {
+    if (cursors.has(data.userId)) {
+      cursors.get(data.userId).style.display = 'none';
+    }
   } else if (data.type === 'connect') {
     userId = data.userId;
   } else if (data.type === 'disconnect') {
