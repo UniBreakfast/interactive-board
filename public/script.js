@@ -38,9 +38,7 @@ ws.onmessage = (event) => {
     }
 
     const cursor = cursors.get(data.userId);
-    cursor.style.left = data.x + 'px';
-    cursor.style.top = data.y + 'px';
-    cursor.style.display = 'block';
+    updateCursorPosition(cursor, data);
   } else if (data.type === 'hide') {
     if (cursors.has(data.userId)) {
       cursors.get(data.userId).style.display = 'none';
@@ -60,3 +58,15 @@ ws.onclose = () => {
   cursors.forEach(cursor => cursor.remove());
   cursors.clear();
 };
+
+function updateCursorPosition(cursor, data) {
+  const size = 4 + (76 * data.y / window.innerHeight);
+
+  cursor.style.left = data.x + 'px';
+  cursor.style.top = data.y + 'px';
+  cursor.style.display = 'block';
+
+  cursor.style.width = size + 'px';
+  cursor.style.height = size + 'px';
+
+}
