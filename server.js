@@ -2,12 +2,25 @@ const http = require('http');
 const fs = require('fs');
 const WebSocket = require('ws');
 
+const mimeTypes = {
+  html: 'text/html',
+  css: 'text/css',
+  js: 'text/javascript',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  svg: 'image/svg+xml',
+  ico: 'image/x-icon'
+};
 // Create HTTP server
 const server = http.createServer((req, res) => {
   if (req.url === '/') req.url = '/index.html';
   try {
     const file = fs.readFileSync('public' + req.url);
-    res.writeHead(200);
+    const ext = req.url.split('.').pop();
+    const type = mimeTypes[ext];
+    res.writeHead(200, { 'Content-Type': type });
     res.end(file);
   } catch (error) {
     if (error.code === 'ENOENT') {
